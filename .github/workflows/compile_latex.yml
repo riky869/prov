@@ -1,4 +1,4 @@
-name: Compile LaTeX to PDF
+name: Build and Deploy LaTeX document
 
 on:
   push:
@@ -8,35 +8,27 @@ on:
       - '**/*.tex'
 
 jobs:
-  build:
+  build_and_deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Set up Git repository
+        uses: actions/checkout@v4
 
-      - name: Set up LaTeX
-        run: sudo apt-get install -y texlive-latex-extra
+      - name: Compile LaTeX document
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: main.tex  # Sostituisci con il tuo file .tex principale
 
-      - name: Compile LaTeX file
-        run: |
-          latexmk -pdf -output-directory=output myfile.tex  # Sostituisci con il tuo file .tex
-        working-directory: ./  # Path del file .tex
+      - name: Upload PDF file as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PDF
+          path: main.pdf
 
-      - name: Copy PDF to GitHub Pages branch
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -b gh-pages || git checkout gh-pages
-          mkdir -p ./pdfs
-          cp ./output/myfile.pdf ./pdfs/
-          git add ./pdfs/myfile.pdf
-          git commit -m "Update PDF"
-          git push origin gh-pages
-
-      - name: Create link to PDF
-        run: |
-          echo "[Link to PDF](./pdfs/myfile.pdf)" > ./README.md
-          git add README.md
-          git commit -m "Add link to PDF"
-          git push origin gh-pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          publish_dir: .  # Puoi specificare una sottocartella se necessario, ad esempio "./pdfs"
+          publish_branch: main  # Utilizza il branch corrente, senza bisogno di gh-pages
+          personal_token: ${{ secrets.GITHUB_TOKEN }}
