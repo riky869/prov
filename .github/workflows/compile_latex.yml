@@ -1,0 +1,42 @@
+name: Compile LaTeX to PDF
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**/*.tex'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up LaTeX
+        run: sudo apt-get install -y texlive-latex-extra
+
+      - name: Compile LaTeX file
+        run: |
+          latexmk -pdf -output-directory=output myfile.tex  # Sostituisci con il tuo file .tex
+        working-directory: ./  # Path del file .tex
+
+      - name: Copy PDF to GitHub Pages branch
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b gh-pages || git checkout gh-pages
+          mkdir -p ./pdfs
+          cp ./output/myfile.pdf ./pdfs/
+          git add ./pdfs/myfile.pdf
+          git commit -m "Update PDF"
+          git push origin gh-pages
+
+      - name: Create link to PDF
+        run: |
+          echo "[Link to PDF](./pdfs/myfile.pdf)" > ./README.md
+          git add README.md
+          git commit -m "Add link to PDF"
+          git push origin gh-pages
