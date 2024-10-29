@@ -29,18 +29,12 @@ jobs:
     needs: [paper]
     runs-on: ubuntu-latest
     steps:
-      - name: "Check file existence"
-        id: check_files
-        uses: andstor/file-existence-action@v2
-        with:
-          files: "index.html"
-      - name: crea file
-        if: steps.check_files.outputs.files_exists == 'true'
-        run: touch index.html
-      - name: Aggiungi index.html
-        run: echo '<html><body><h1><a href="boh.pdf">Download PDF</a></h1></body></html>' > github_deploy/index.html
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Create deployment directory
+        run: mkdir -p github_deploy
+      - name: Deploy
+        run: echo '<html><body><h1><a href="boh.pdf">Download PDF</a></h1></body></html>' > github_deploy/index.html
       - uses: actions/download-artifact@v4
         with:
           path: github_artifacts
