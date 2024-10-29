@@ -15,21 +15,14 @@ jobs:
       - name: Set up Git repository
         uses: actions/checkout@v4
 
-      - name: Get last modified .tex file
-        id: get-tex-file
-        run: |
-          # Trova l'ultimo file .tex modificato e salvalo in una variabile
-          TEX_FILE=$(git diff --name-only HEAD^ HEAD | grep 'src/.*\.tex$' | head -n 1)
-          echo "::set-output name=tex_file::$TEX_FILE"
-
       - name: Compile LaTeX document
         uses: xu-cheng/latex-action@v3
         with:
-          root_file: ${{ steps.get-tex-file.outputs.tex_file }}
+          root_file: src/boh.tex
           work_in_root_file_dir: true
 
       - name: Deploy PDF to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-          publish_dir: src  # Carica il PDF compilato dalla cartella src
+          publish_dir: src # Carica il PDF compilato dalla cartella src
           personal_token: ${{ secrets.GITHUB_TOKEN }}
