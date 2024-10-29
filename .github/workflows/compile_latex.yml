@@ -1,9 +1,11 @@
-name: Build LaTeX Document
+name: Build and Deploy LaTeX document
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
+    paths:
+      - "src/*.tex"
 jobs:
   build_latex:
     runs-on: ubuntu-latest
