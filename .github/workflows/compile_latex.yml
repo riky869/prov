@@ -49,7 +49,6 @@ jobs:
         run: |
           sudo apt update
           sudo apt install texlive-full
-          mkdir ./src
           cp *.tex src/
           cd src/
           pdflatex main.tex
